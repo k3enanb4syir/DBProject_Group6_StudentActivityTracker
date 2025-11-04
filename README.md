@@ -20,15 +20,19 @@ This repository contains the 5-week project of our Database project with the cho
 **Week 1: Project & ER Diagram**
 - **Folder**: week1_proposal_ERD/
 - **Contains**: The initial project proposal document and the conceptual Entity-Relationship Diagram (ERD).
+
 **Week 2: Logical Scheme & SQL Implementation**
 - **Folder**: week2_schema SQL/
 - **Contains**: The logical relational schema and the .sql script with all CREATE TABLE commands.
+  
 **Week 3: Basic CRUD Operations**
 - **Folder**: week3_CRUD_demo/
 - **Contains**: The initial application source code demostrating all the operations of CRUD
+  
 **Week 4: Application Integration & Interface**
   - **Folder**: week4_integration/
   - **Contains**: The complete application source code, with the database fully connected to the frontend user interface and the search/report feature implemented.
+    
 **Week 5: Final Report & Presentation**
 - **Folder**: week5_final_report/
 - **Contains**: The final project docummentation
