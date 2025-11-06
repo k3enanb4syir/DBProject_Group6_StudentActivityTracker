@@ -1,0 +1,12 @@
+ERD REVISIONS:
+- Fix typos
+- Fix non-capitalized words
+- Change "Extra Curricular" attributes to "Activitiy"
+- Rename "programs" to "Major"
+- Create foreign attribute "Major" to students
+- Create "Record ID" primary key to Participation_record
+- Remove "Full Name" attribute from participation_record
+- Remove "No of Extra Curriculars" attribute along with its children "ID" and "Name"
+- Add Status, Date of Activity, Submission Date attributes to Participation Record
+- Rename "Viewing" relationship to "Administrates"
+- Rename "Teaches" relationship to "Part Of"
