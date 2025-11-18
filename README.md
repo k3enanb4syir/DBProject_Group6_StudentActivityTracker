@@ -37,3 +37,31 @@ This repository contains the 5-week project of our Database project with the cho
 **Week 5: Final Report & Presentation**
 - **Folder**: week5_final_report/
 - **Contains**: The final project docummentation
+
+# Week 3: Basic CRUD Operations Demo
+
+## How to Run This Prototype/Demo
+
+You will need two terminals open.
+
+### Terminal 1: Run the Backend Server
+1.  Navigate to this `week3_CRUD_demo/` folder.
+2.  Install the required Node.js packages:
+    ```bash
+    npm install
+    ```
+3.  **One-Time Setup:** Create the database by running the setup script (this reads your `.sql` file):
+    ```bash
+    node setupDatabase.js
+    ```
+    *(You only need to do this once. A `tracker.db` file will appear.)*
+
+4.  Start the backend API server:
+    ```bash
+    node server.js
+    ```
+    *(The server will now be running on `http://localhost:3001`)*
+
+### Terminal 2: View the Frontend
+1.  Simply open the `index.html` file in your web browser.
+2.  You can now use the form to Create, Read, Update, and Delete students. The data will be saved in the `tracker.db` file.
