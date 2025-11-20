@@ -43,4 +43,10 @@ CREATE TABLE Participation_Record (
     FOREIGN KEY (NIM) REFERENCES Students(NIM) ON DELETE CASCADE,
     FOREIGN KEY (Activity_ID) REFERENCES Activity(Activity_ID) ON DELETE CASCADE,
     FOREIGN KEY (Approver_Faculty_ID) REFERENCES Faculty(Faculty_ID)
+
 );
+
+INSERT INTO Faculty (Faculty_Name, Email, Phone_Number) VALUES 
+('Dr. Alice Johnson', 'alice@university.edu', '555-0101'),
+('Prof. Bob Smith', 'bob@university.edu', '555-0102'),
+('Dr. Carol White', 'carol@university.edu', '555-0103');
