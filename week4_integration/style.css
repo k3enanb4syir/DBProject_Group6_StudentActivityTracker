@@ -1,0 +1,7 @@
+/* Simple style for modal transitions */
+.modal {
+    transition: opacity 0.25s ease;
+}
+.modal-content {
+    transition: transform 0.25s ease;
+}
