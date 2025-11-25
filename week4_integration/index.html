@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Activity Tracker - Week 4</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-100 text-gray-800 font-sans p-8">
+
+    <div class="max-w-7xl mx-auto">
+        <header class="mb-10 flex justify-between items-center">
+            <div>
+                <h1 class="text-4xl font-bold text-blue-600">Student Activity Tracker</h1>
+                <p class="text-xl text-gray-600">Week 4: Application Integration</p>
+            </div>
+            <!-- Simple Navigation Tabs -->
+            <div class="space-x-4">
+                <button onclick="showSection('admin')" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Admin Dashboard</button>
+                <button onclick="showSection('student')" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">Student Portal</button>
+                <button onclick="showSection('manage')" class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700">Manage Data</button>
+            </div>
+        </header>
+
+        <!-- Loading & Error Messages -->
+        <div id="loading-spinner" class="hidden text-center p-4"><p class="text-lg text-gray-600">Processing...</p></div>
+        <div id="error-message" class="hidden bg-red-100 text-red-700 p-4 rounded mb-6"></div>
+
+        <!-- ================================================================== -->
+        <!-- SECTION 1: ADMIN DASHBOARD (Approvals) -->
+        <!-- ================================================================== -->
+        <section id="admin-section" class="mb-12">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800 border-b-4 border-blue-600 pb-2 inline-block">Admin Dashboard</h2>
+            
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+                <div class="p-4 bg-gray-50 border-b flex justify-between items-center">
+                    <h3 class="text-lg font-semibold text-gray-700">Pending Approvals</h3>
+                    <button onclick="fetchAdminRecords()" class="text-sm text-blue-600 hover:underline">Refresh List</button>
+                </div>
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Date</th>
+                            <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Student</th>
+                            <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Activity</th>
+                            <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Role</th>
+                            <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Status</th>
+                            <th class="px-6 py-3 text-right text-xs font-bold text-gray-500 uppercase">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-table-body" class="bg-white divide-y divide-gray-200">
+                        <!-- Rows injected by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ================================================================== -->
+        <!-- SECTION 2: STUDENT PORTAL (Join & History) -->
+        <!-- ================================================================== -->
+        <section id="student-section" class="mb-12 hidden">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800 border-b-4 border-green-600 pb-2 inline-block">Student Portal</h2>
+
+            <!-- "Login" Simulation -->
+            <div class="bg-white p-6 rounded-lg shadow-md mb-8 border-l-4 border-green-500">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Simulate Login: Act as Student</label>
+                <select id="active-student-select" class="block w-full md:w-1/3 rounded-md border-gray-300 shadow-sm p-2 border">
+                    <option value="">-- Select a Student --</option>
+                    <!-- Populated by JS -->
+                </select>
+            </div>
+
+            <div id="student-content" class="hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    
+                    <!-- Form: Join Activity -->
+                    <div class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-lg font-semibold mb-4 text-gray-700">Register for Activity</h3>
+                        <form id="join-activity-form" class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Select Activity</label>
+                                <select id="join-activity-select" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border"></select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Role</label>
+                                <input type="text" id="join-role" placeholder="e.g. Member, Volunteer" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Hours Completed</label>
+                                <input type="number" id="join-hours" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Date of Activity</label>
+                                <input type="date" id="join-date" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm p-2 border">
+                            </div>
+                            <button type="submit" class="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700 font-semibold">Submit for Approval</button>
+                        </form>
+                    </div>
+
+                    <!-- Table: My History -->
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                        <div class="p-4 bg-gray-50 border-b">
+                            <h3 class="text-lg font-semibold text-gray-700">My Activity History</h3>
+                        </div>
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="px-4 py-2 text-left text-xs font-bold text-gray-500 uppercase">Activity</th>
+                                    <th class="px-4 py-2 text-left text-xs font-bold text-gray-500 uppercase">Role</th>
+                                    <th class="px-4 py-2 text-left text-xs font-bold text-gray-500 uppercase">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="student-history-body" class="bg-white divide-y divide-gray-200"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================================================================== -->
+        <!-- SECTION 3: MANAGE DATA (Week 3 CRUD) -->
+        <!-- ================================================================== -->
+        <section id="manage-section" class="mb-12 hidden">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800 border-b-4 border-gray-600 pb-2 inline-block">Manage Database</h2>
+            
+            <!-- Add Student Form -->
+            <form id="student-form" class="bg-white p-6 rounded-lg shadow-md mb-8 grid grid-cols-1 md:grid-cols-4 gap-4">
+                <input type="hidden" id="editing-nim" value="">
+                <input type="number" id="student-nim" placeholder="NIM" required class="p-2 border rounded">
+                <input type="text" id="student-name" placeholder="Full Name" required class="p-2 border rounded">
+                <input type="email" id="student-email" placeholder="Email" required class="p-2 border rounded">
+                <input type="text" id="student-major" placeholder="Major" class="p-2 border rounded">
+                <select id="student-dpa" class="p-2 border rounded"><option value="">No Advisor</option></select>
+                <button type="submit" class="bg-gray-800 text-white py-2 rounded hover:bg-black md:col-span-4">Save Student</button>
+            </form>
+
+            <!-- Students List -->
+            <div class="bg-white rounded-lg shadow-md overflow-hidden">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">NIM</th>
+                            <th class="px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase">Name</th>
+                            <th class="px-6 py-3 text-right text-xs font-bold text-gray-500 uppercase">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="students-table-body" class="divide-y divide-gray-200"></tbody>
+                </table>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- Modal -->
+    <div id="message-modal" class="modal fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
+        <div class="bg-white p-6 rounded-lg shadow-xl max-w-sm w-full">
+            <h3 id="modal-title" class="text-lg font-bold mb-2">Message</h3>
+            <p id="modal-message" class="text-gray-600 mb-4">Text</p>
+            <button onclick="closeModal()" class="bg-blue-600 text-white px-4 py-2 rounded w-full">OK</button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        // Simple Tab Switcher Logic
+        function showSection(sectionName) {
+            document.getElementById('admin-section').classList.add('hidden');
+            document.getElementById('student-section').classList.add('hidden');
+            document.getElementById('manage-section').classList.add('hidden');
+            document.getElementById(sectionName + '-section').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
