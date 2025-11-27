@@ -1,0 +1,59 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* --- COLOR PALETTE VARIABLES --- */
+:root {
+  /* Brand Colors */
+  --primary-color: #4f46e5;       /* Indigo */
+  --primary-hover: #4338ca;       /* Darker Indigo */
+  
+  /* Backgrounds */
+  --bg-dark: #1a1a1a;
+  --bg-gradient: radial-gradient(circle at top left, #2b2b2b, #1a1a1a);
+  
+  /* Status Colors */
+  --status-approved: #10b981;
+  --status-rejected: #ef4444;
+  --status-pending: #f59e0b;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  background-color: var(--bg-dark);
+  color: #333;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #2c2c2c; 
+}
+
+::-webkit-scrollbar-thumb {
+  background: #555; 
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #777; 
+}
