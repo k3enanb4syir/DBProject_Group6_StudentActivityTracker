@@ -1,14 +1,12 @@
 # Student Activity Tracker
 
-A web application for tracking student activities. Built with Node.js, SQLite, and Vite.
+A web application for tracking student activities. Built with Node.js, SQLite, React, and Vite.
 
-## 📋 Prerequisites
+## Prerequisites
 
-Before you begin, make sure you have the following installed on your computer:
-* [Node.js](https://nodejs.org/) (Version 14 or higher)
-* [Git](https://git-scm.com/)
+Before you begin, make sure you have [Node.js](https://nodejs.org/) installed on your computer.
 
-## 🚀 Installation
+## Installation & Setup
 
 1.  **Clone the repository**
     ```bash
@@ -17,26 +15,23 @@ Before you begin, make sure you have the following installed on your computer:
     ```
 
 2.  **Install Dependencies**
-    Run this command to download all the libraries required (the node_modules):
+    Run the following commands to install the necessary libraries, including the icon pack:
     ```bash
     npm install
+    npm install react-icons
     ```
 
-## 🗄️ Database Setup
+3.  **Database Setup**
+    The database file (`student_tracker.db`) is not included in the download. You need to create it:
+    * Open the file `StudentActivityTracker.sql` in this folder.
+    * Run the SQL commands inside it (using an SQLite extension in VS Code or "DB Browser for SQLite") to generate your local database.
 
-Since the local database file is not uploaded to GitHub, you need to initialize it:
+## How to Run
 
-1.  Ensure you have the `StudentActivityTracker.sql` file (it is included in this repo).
-2.  **Option A (If you have a customized script):** Run your database initialization script if you have one.
-3.  **Option B (Manual):**
-    * Open `StudentActivityTracker.sql` using an SQLite viewer (like *DB Browser for SQLite*) or a VS Code extension.
-    * Run the SQL commands to generate the `student_tracker.db` file in the root directory.
+You need to run the backend and frontend in **two separate terminal windows**.
 
-## 🏃‍♂️ How to Run
-
-You likely need to run both the backend server and the frontend.
-
-**1. Start the Backend Server**
-Open a terminal and run:
+**Step 1: Start the Backend Server**
+Open a terminal inside the project folder and run:
 ```bash
 node server.js
+```
