@@ -35,3 +35,21 @@ Open a terminal inside the project folder and run:
 ```bash
 node server.js
 ```
+**Step 2: Start the Frontend Open a new terminal window inside the project folder and run:**
+```
+npm run dev
+```
+**Step 3: Open in Browser**
+- Look at the "Step 2" terminal output.
+- Control-click the link shown (usually http://localhost:5173 or http://localhost:5174).
+
+## Available Log-ins:
+**Admins:**
+- bob@university.edu password: admin123
+- alice@univesity.edu password: admin123
+- carol@university.edu password: admin123
+
+**Students:**
+- keenan@university.edu password: password123
+- marvel@university.edu password: password123
+- fayyadh@university.edu password: password123
