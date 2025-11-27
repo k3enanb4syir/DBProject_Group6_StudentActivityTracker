@@ -1,9 +1,0 @@
-# Ignore the node.js dependency folder
-/node_modules
-
-# Ignore the SQLite database file
-# This is data, not source code
-*.db
-
-# Ignore macOS system files
-.DS_Store
