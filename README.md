@@ -38,9 +38,9 @@ This repository contains the 5-week project of our Database project with the cho
 - **Folder**: week5_final_report/
 - **Contains**: The final project docummentation
 
-# **Week 3: Basic CRUD Operations Demo**
+# **Week 3 & 4: Basic CRUD Operations Demo & Integration Setup**
 
-## How to Run This Prototype/Demo
+## How to Run This Prototype/Demo & Integration Application
 
 You will need two terminals open.
 
