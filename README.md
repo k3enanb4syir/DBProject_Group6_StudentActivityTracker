@@ -45,7 +45,7 @@ This repository contains the 5-week project of our Database project with the cho
 You will need two terminals open.
 
 ### Terminal 1: Run the Backend Server
-1.  Navigate to this `week3_CRUD_demo/` folder.
+1.  Navigate to this `week5_application_integration/` folder.
 2.  Install the required Node.js packages:
     ```bash
     npm install
