@@ -19,6 +19,7 @@ Before you begin, make sure you have [Node.js](https://nodejs.org/) installed on
     ```bash
     npm install
     npm install react-icons
+    npm install multer
     ```
 
 3.  **Database Setup**
