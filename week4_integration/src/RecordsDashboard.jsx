@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaUser, FaPlus, FaSignOutAlt } from 'react-icons/fa'; // Import Logout Icon
+import { FaUser, FaPlus, FaSignOutAlt } from 'react-icons/fa'; 
 import './Dashboard.css';
 
 const RecordsDashboard = () => {
@@ -46,7 +46,7 @@ const RecordsDashboard = () => {
           <div className="profile-info">
             <h2>Welcome,</h2>
             <h1 style={{textTransform: 'uppercase'}}>{user.Full_Name}</h1>
-            <p>Major Student ({user.NIM})</p>
+            <p>Undergraduate Student ({user.NIM})</p>
           </div>
           {/* Logout Button */}
           <button className="logout-button" onClick={handleLogout} title="Sign Out">
@@ -54,9 +54,7 @@ const RecordsDashboard = () => {
           </button>
         </div>
         <div className="profile-stats">
-            {/* Using Placeholders for GPA as they aren't in DB yet */}
             <div className="stat-item"><h3>Major</h3><span>{user.Major}</span></div>
-            <div className="stat-item"><h3>GPA</h3><span>3.85</span></div>
             <div className="stat-item"><h3>Status</h3><span>Active</span></div>
         </div>
       </div>
