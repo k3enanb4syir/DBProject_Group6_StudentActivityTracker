@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaCalendarAlt, FaClock, FaTag, FaClipboardList } from 'react-icons/fa';
+import { FaCalendarAlt, FaClock, FaTag, FaClipboardList, FaFileUpload } from 'react-icons/fa';
 import './SubmitRecord.css';
 
 const SubmitRecord = () => {
@@ -13,7 +13,8 @@ const SubmitRecord = () => {
     activity_id: '',
     role: '',
     date: '',  // Maps to Date_Of_Activity
-    hours: ''  // Maps to Hours_Submitted
+    hours: '',  // Maps to Hours_Submitted
+    file: null // NEW: File upload state
   });
 
   // 1. Fetch Activities for the Dropdown
@@ -25,7 +26,12 @@ const SubmitRecord = () => {
   }, []);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value, files } = e.target;
+    if (name === 'file') {
+      setFormData({ ...formData, file: files[0] });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -34,17 +40,25 @@ const SubmitRecord = () => {
 
     const user = JSON.parse(localStorage.getItem('currentUser'));
 
+    // Create a FormData object to handle file uploads
+    const data = new FormData();
+    data.append('nim', user.NIM);
+    data.append('activity_id', formData.activity_id);
+    data.append('role', formData.role);
+    data.append('date', formData.date);
+    data.append('hours', formData.hours);
+    
+    // Only append the file if one was selected
+    if (formData.file) {
+      data.append('file', formData.file);
+    }
+
     try {
+      // NOTE: Do not set Content-Type header manually when sending FormData
+      // The browser sets it automatically to multipart/form-data with the correct boundary
       const response = await fetch('http://localhost:3000/api/records', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          nim: user.NIM,
-          activity_id: formData.activity_id,
-          role: formData.role,
-          date: formData.date,
-          hours: formData.hours
-        })
+        body: data, 
       });
 
       if (response.ok) {
@@ -128,6 +142,19 @@ const SubmitRecord = () => {
                   required
                 />
               </div>
+            </div>
+
+            {/* File Upload Input */}
+            <div className="input-block">
+              <label><FaFileUpload style={{marginRight: '8px'}}/> Proof of Participation (PDF)</label>
+              <input 
+                type="file" 
+                name="file" 
+                accept=".pdf"
+                onChange={handleChange} 
+                // required // Optional: make it required if necessary
+                style={{padding: '10px'}}
+              />
             </div>
 
           </div>
