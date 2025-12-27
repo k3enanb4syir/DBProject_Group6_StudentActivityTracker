@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaUserTie, FaCheck, FaTimes, FaSignOutAlt, FaSync } from 'react-icons/fa'; 
+import { FaUserTie, FaCheck, FaTimes, FaSignOutAlt, FaSync, FaFilePdf } from 'react-icons/fa'; // Added FaFilePdf
 import './Dashboard.css';
 
 const AdminDashboard = () => {
@@ -27,7 +27,6 @@ const AdminDashboard = () => {
     setLoading(true);
     setError(null);
     
-    // UPDATED: Use 127.0.0.1 to avoid localhost resolution issues
     fetch('http://127.0.0.1:3000/api/admin/pending')
       .then(res => {
         if (!res.ok) {
@@ -42,7 +41,6 @@ const AdminDashboard = () => {
       })
       .catch(err => {
         console.error("Error fetching requests:", err);
-        // UPDATED: Show the ACTUAL error message to help debug
         setError(`Connection Error: ${err.message}`);
         setLoading(false);
       });
@@ -50,7 +48,6 @@ const AdminDashboard = () => {
 
   const handleReview = async (recordId, status) => {
     try {
-      // UPDATED: Use 127.0.0.1
       const response = await fetch('http://127.0.0.1:3000/api/admin/review', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -175,7 +172,24 @@ const AdminDashboard = () => {
                   </div>
                 </div>
 
-                <div style={{width: '100%', display: 'flex', gap: '10px', marginTop: '5px'}}>
+                {/* Proof File Link */}
+                {req.Proof_File && (
+                    <div style={{width: '100%', marginTop: '5px'}}>
+                        <a 
+                            href={`http://127.0.0.1:3000/uploads/${req.Proof_File}`} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            style={{
+                                display: 'flex', alignItems: 'center', gap: '8px',
+                                textDecoration: 'none', color: '#4f46e5', fontWeight: '600', fontSize: '14px'
+                            }}
+                        >
+                            <FaFilePdf /> View Proof of Participation
+                        </a>
+                    </div>
+                )}
+
+                <div style={{width: '100%', display: 'flex', gap: '10px', marginTop: '10px'}}>
                     <button 
                         onClick={() => handleReview(req.Record_ID, 'Approved')}
                         style={{
