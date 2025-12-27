@@ -40,7 +40,7 @@ This repository contains the 5-week project of our Database project with the cho
 
 # **Application Integration**
 
-## How to Run This Prototype/Demo & Application Integration
+## How to Run This Application Integration
 
 You will need two terminals open.
 
