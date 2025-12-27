@@ -2,14 +2,47 @@ import express from 'express';
 import sqlite3 from 'sqlite3';
 import cors from 'cors';
 import fs from 'fs';
+import multer from 'multer';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 const app = express();
 const PORT = 3000;
+
+// Setup for static file serving (ES Modules workaround for __dirname)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const dbDriver = sqlite3.verbose();
 
 app.use(cors());
 app.use(express.json());
+
+// --- FILE UPLOAD CONFIGURATION ---
+// 1. Ensure 'uploads' directory exists
+const uploadDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir);
+}
+
+// 2. Serve uploaded files statically so Admins can view them
+// Access via: http://localhost:3000/uploads/filename.pdf
+app.use('/uploads', express.static(uploadDir));
+
+// 3. Configure Multer Storage
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'uploads/');
+    },
+    filename: (req, file, cb) => {
+        // Unique filename: Timestamp + Random + Original Extension
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniqueSuffix + path.extname(file.originalname));
+    }
+});
+
+const upload = multer({ storage: storage });
+
 
 // 1. Connect to Database
 const db = new dbDriver.Database('./student_tracker.db', (err) => {
@@ -17,20 +50,23 @@ const db = new dbDriver.Database('./student_tracker.db', (err) => {
     else console.log("Connected to the SQLite database.");
 });
 
-// 2. Initialize Database from SQL File (Returns Promise)
+// 2. Initialize Database from SQL File
 const initDatabase = () => {
     return new Promise((resolve, reject) => {
         try {
-            // Read the SQL file from the root directory
             const dataSql = fs.readFileSync('./StudentActivityTracker.sql', 'utf8');
-            
-            // Execute the SQL script
             db.exec(dataSql, (err) => {
                 if (err) {
                     reject(err);
                 } else {
                     console.log("Database initialized from SQL file.");
-                    resolve();
+                    
+                    // AUTO-MIGRATION: Add Proof_File column if it doesn't exist
+                    // This creates the column automatically without deleting your DB
+                    db.run("ALTER TABLE Participation_Record ADD COLUMN Proof_File VARCHAR(255)", (err) => {
+                        // Ignore error if column already exists
+                        resolve();
+                    });
                 }
             });
         } catch (err) {
@@ -45,37 +81,35 @@ const initDatabase = () => {
 app.post('/api/login', (req, res) => {
     const { email, password } = req.body;
     
-    // Check Students Table First
     const sqlStudent = "SELECT * FROM Students WHERE Email = ? AND Password = ?";
     db.get(sqlStudent, [email, password], (err, student) => {
         if (err) return res.status(500).json({ error: err.message });
+        if (student) return res.json({ role: 'student', data: student });
         
-        if (student) {
-            return res.json({ role: 'student', data: student });
-        } else {
-            // Check Faculty Table
-            const sqlFaculty = "SELECT * FROM Faculty WHERE Email = ? AND Password = ?";
-            db.get(sqlFaculty, [email, password], (err, faculty) => {
-                if (err) return res.status(500).json({ error: err.message });
-                if (faculty) {
-                    return res.json({ role: 'faculty', data: faculty });
-                } else {
-                    return res.status(401).json({ error: "Invalid credentials" });
-                }
-            });
-        }
+        const sqlFaculty = "SELECT * FROM Faculty WHERE Email = ? AND Password = ?";
+        db.get(sqlFaculty, [email, password], (err, faculty) => {
+            if (err) return res.status(500).json({ error: err.message });
+            if (faculty) return res.json({ role: 'faculty', data: faculty });
+            return res.status(401).json({ error: "Invalid credentials" });
+        });
     });
 });
 
-// Get Activities (For Student Dashboard & Dropdown)
+// Get Activities
 app.get('/api/activities', (req, res) => {
-    db.all("SELECT * FROM Activity", [], (err, rows) => {
+    const sql = `
+        SELECT A.*, F.Faculty_Name AS Advisor_Name, S.Full_Name AS President_Name
+        FROM Activity A
+        LEFT JOIN Faculty F ON A.Advisor_Faculty_ID = F.Faculty_ID
+        LEFT JOIN Students S ON A.President_NIM = S.NIM
+    `;
+    db.all(sql, [], (err, rows) => {
         if (err) return res.status(500).json({ error: err.message });
         res.json(rows);
     });
 });
 
-// Get Specific Student Records (For Student History)
+// Get Records
 app.get('/api/records', (req, res) => {
     const { nim } = req.query; 
     const sql = `
@@ -90,9 +124,13 @@ app.get('/api/records', (req, res) => {
     });
 });
 
-// Submit New Record (Student Action)
-app.post('/api/records', (req, res) => {
+// Submit Record (UPDATED: Handle Multipart Form Data)
+// 'upload.single('file')' extracts the file from the request
+app.post('/api/records', upload.single('file'), (req, res) => {
+    // req.file contains the uploaded file info
+    // req.body contains the text fields
     const { nim, activity_id, role, date, hours } = req.body;
+    const proofFile = req.file ? req.file.filename : null;
 
     if (!nim || !activity_id || !date || !hours) {
         return res.status(400).json({ error: "Missing required fields" });
@@ -100,11 +138,11 @@ app.post('/api/records', (req, res) => {
 
     const sql = `
         INSERT INTO Participation_Record 
-        (NIM, Activity_ID, Role, Date_Of_Activity, Submission_Date, Hours_Submitted, Status) 
-        VALUES (?, ?, ?, ?, DATE('now'), ?, 'Pending')
+        (NIM, Activity_ID, Role, Date_Of_Activity, Submission_Date, Hours_Submitted, Status, Proof_File) 
+        VALUES (?, ?, ?, ?, DATE('now'), ?, 'Pending', ?)
     `;
 
-    db.run(sql, [nim, activity_id, role, date, hours], function(err) {
+    db.run(sql, [nim, activity_id, role, date, hours, proofFile], function(err) {
         if (err) return res.status(500).json({ error: err.message });
         res.json({ message: "Record submitted successfully", id: this.lastID });
     });
@@ -112,7 +150,7 @@ app.post('/api/records', (req, res) => {
 
 // --- ADMIN ROUTES ---
 
-// 1. Get All Pending Requests (For Admin Dashboard)
+// Get Pending Requests
 app.get('/api/admin/pending', (req, res) => {
     const sql = `
         SELECT P.*, S.Full_Name as Student_Name, A.Activity_Name, A.Activity_Type
@@ -127,36 +165,23 @@ app.get('/api/admin/pending', (req, res) => {
     });
 });
 
-// 2. Approve or Reject a Request (Admin Action)
+// Review Request
 app.post('/api/admin/review', (req, res) => {
     const { record_id, status, faculty_id } = req.body;
+    if (!['Approved', 'Rejected'].includes(status)) return res.status(400).json({ error: "Invalid status" });
 
-    if (!['Approved', 'Rejected'].includes(status)) {
-        return res.status(400).json({ error: "Invalid status" });
-    }
-
-    const sql = `
-        UPDATE Participation_Record 
-        SET Status = ?, Approver_Faculty_ID = ? 
-        WHERE Record_ID = ?
-    `;
-
+    const sql = "UPDATE Participation_Record SET Status = ?, Approver_Faculty_ID = ? WHERE Record_ID = ?";
     db.run(sql, [status, faculty_id, record_id], function(err) {
         if (err) return res.status(500).json({ error: err.message });
         res.json({ message: `Record ${status} successfully` });
     });
 });
 
-// --- STARTUP LOGIC ---
-// Only start server AFTER DB is ready to prevent "no such table" errors
-initDatabase()
-    .then(() => {
-        app.listen(PORT, () => {
-            console.log(`Server running on http://localhost:${PORT}`);
-        });
-    })
-    .catch((err) => {
-        console.error("CRITICAL ERROR: Could not initialize database.");
-        console.error("Make sure 'StudentActivityTracker.sql' is in the root folder.");
-        console.error(err);
+// Start Server
+initDatabase().then(() => {
+    app.listen(PORT, () => {
+        console.log(`Server running on http://localhost:${PORT}`);
     });
+}).catch(err => {
+    console.error("CRITICAL ERROR: Could not initialize database.", err);
+});
